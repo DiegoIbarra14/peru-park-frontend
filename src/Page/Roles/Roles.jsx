@@ -52,7 +52,7 @@ export default function PageRoles() {
   })
   const [userRole, setUserRole] = useState({})
   const [areas, setAreas] = useState([
-    'Lista de Producción',
+    'inicio',
     'Almacén de Mat. Primas',
     'Lista de Proveedores',
     'Lista de Máquinas',

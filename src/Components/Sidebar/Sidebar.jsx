@@ -105,10 +105,10 @@ const Sidebar = ({ onSidebarToggle }) => {
   );
 
   const listIcons = {
-    "Lista de producción": <Produccion />,
-    "Lista de Proveedores": <Proveedores />,
-    "Mod. Reprocesamiento": <Reprocesamiento />,
-    "Lista de Máquinas": <Maquinas />,
+    "INICIO": <Produccion />,
+    "LOCALES": <Proveedores />,
+    "NOTIFICACIONES": <Reprocesamiento />,
+    "MIS ALQUILERES": <Maquinas />,
     "Lista de Trabajadores": <Trabajadores />,
     "Lista de Clientes": <Clientes />,
     "Lista de Servicios": <Servicios />,

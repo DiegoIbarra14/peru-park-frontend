@@ -1,24 +1,26 @@
 
-import logo_2 from "../Imagenes/tablero_menu_izquierdo.svg"
-import usuario from "../Imagenes/usuario.svg"
-import logo_gey from "../Imagenes/tablero_menu_derecho.svg"
+import logo_2 from "../Imagenes/PERUPARK.webp"
+import usuario from "../Imagenes/PERUPARK3.webp"
+import logo_gey from "../Imagenes/PERUPARK4.webp"
 export const cardContents = [
+  
     {
       img: logo_2,
-      title: 'SIPRO',
-      description: 'optimiza tu cadena de suministro',
-      subDescription: 'gestiona eficientemente tus materias primas con nuestra tecnología.'
+      title: 'PERUPARK',
+      description: 'Optimiza tu experiencia de estacionamiento',
+      subDescription: 'Gestiona tu tiempo y espacio con nuestra tecnología avanzada.'
     },
     {
       img: usuario,
-      title: 'SIPRO',
-      description: 'facilita la administración eficiente de tu inventario',
-      subDescription: 'optimiza tus recursos con nuestra innovadora solución.'
+      title: 'PERUPARK',
+      description: 'Facilita la administración eficiente de tu vehículo',
+      subDescription: 'Encuentra y reserva tu lugar de estacionamiento de manera rápida y sencilla.'
     },
     {
       img: logo_gey,
-      title: 'SIPRO',
-      description: 'transforma la gestión de tus materiales',
-      subDescription: 'mejora el control de tus recursos con nuestra avanzada plataforma.'
+      title: 'PERUPARK',
+      description: 'Transforma la manera de estacionar',
+      subDescription: 'Mejora el control y la seguridad de tus vehículos con nuestra plataforma innovadora.'
     }
-  ];
+  ]
+  

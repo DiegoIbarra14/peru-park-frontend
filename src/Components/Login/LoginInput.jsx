@@ -1,6 +1,6 @@
 import React from "react";
 //import logo from "../../Imagenes/login_logo_1.png";
-import logo from "../../Imagenes/sipro-logo.svg";
+import logo from "../../Imagenes/LOGO-Photoroom.png";
 import { useState } from "react";
 import logo_empresa from "../../Imagenes/sipro.svg"
 import { InputText } from "primereact/inputtext";
@@ -13,7 +13,6 @@ import { Button } from "primereact/button";
 import "./loginInput.css";
 import "../../../node_modules/primeflex/primeflex.css"
 import { cardContents } from "../../data/content-card-login";
-
 function LoginInput(props) {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -78,19 +77,19 @@ function LoginInput(props) {
             </div>
             <div className="contenedor-login-message flex flex-column align-items-center justify-content-center ">
               <div className="content-frase"><p>¡Hola,<span className="content-frase-second"> bienvenido!</span></p></div>
-              <p className="frase">Ingresa su usuario y contraseña</p>
+              
             </div>
             <div className="contenedor-login-container-inputs">
               <div className="flex flex-column gap-4">
                 <div className="login-field flex flex-column  gap-1">
-                  <label htmlFor="email">Correo electronico</label>
+                  <label htmlFor="username">Correo Electronico</label>
                   <InputText value={props.valueUsuario}
-                    onChange={props.onChangeValueUsuario} id="email" placeholder="Ingrese su correo electronico" onKeyDown={handleKeyPress}/>
+                    onChange={props.onChangeValueUsuario} id="username" placeholder="Nombre de usuario" onKeyDown={handleKeyPress}/>
                 </div>
                 <div className="login-field flex flex-column gap-1 ">
                   <label htmlFor="password">Contraseña</label>
                   <div className="" >
-                    <Password toggleMask feedback={false} placeholder="Ingrese su contraseña" className="content-input-password" value={props.valuePassword} onChange={props.onChangeValuePassword} onKeyDown={handleKeyPress} id="password" />
+                    <Password toggleMask feedback={false} placeholder="Contraseña" className="content-input-password" value={props.valuePassword} onChange={props.onChangeValuePassword} onKeyDown={handleKeyPress} id="password" />
                   </div>
 
                 </div>
