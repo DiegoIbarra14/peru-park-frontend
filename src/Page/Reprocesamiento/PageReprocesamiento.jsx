@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import { collection, addDoc, getDocs, doc, deleteDoc, updateDoc } from "firebase/firestore";
 import Container from '../../Components/Container/Container';
 import { InputText } from 'primereact/inputtext';
 import { Dropdown } from 'primereact/dropdown';
@@ -18,6 +19,9 @@ import { ConfirmDialog } from 'primereact/confirmdialog';
 import TextTrimmer from '../../Components/General/TextTrimmer';
 import ListProduccion from '../../Components/Produccion/ListProduccion';
 import TableIngredientes from '../../Components/Producto/TableIngredientes';
+import CreateLocal from './CreateLocal';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import auth, { db } from '../../config/firebase/firebaseinstance';
 
 
 export const PageReprocesamiento = () => {
@@ -32,6 +36,25 @@ export const PageReprocesamiento = () => {
             life: 3000,
         });
     };
+    const [local, setLocal] = useState({
+        nombre: "",
+        hora_atencion: "",
+        latitud: "",
+        longitud: "",
+        distrito: "",
+        direccion: "",
+        descripcion: "",
+        categoria: "",
+        departamento: ""
+    })
+    const optionsCategorias = [{
+        code: "cat-eco", label: "Economico"
+    },
+    {
+        code: "cat-24h", label: "Abierto 24h"
+    },
+
+    ]
 
 
     //constantes para mis datos
@@ -67,72 +90,46 @@ export const PageReprocesamiento = () => {
                 console.log(error);
             });
     };
-    useEffect(() => {
-        getAllProducciones();
-        getAllPresentaciones();
-        getAllMateriasPrimas();
-        getAllMaquinas();
-        getAllResponsables();
-    }, []);
-
-    //para filtrar las producciones de reprocesamiento
-    useEffect(() => {
-        if (producciones) {
-            const produccionesReproceso = producciones.filter(item => item.estado_produccion === "5");
-            setProduccionesReproceso(produccionesReproceso);//aca estoy seteando las producciones filtradas
-            console.log("productos filtradossss: ", produccionesReproceso);
+    const createLocal = async (local) => {
+        try {
+            const docRef = await addDoc(collection(db, "local"), local);
+            console.log("Local creado con ID: ", docRef.id);
+        } catch (e) {
+            console.error("Error al agregar el local: ", e);
         }
-    }, [producciones]);
+    };
 
+    // Función para obtener todos los locales
+    const getLocales = async () => {
+        const locales = [];
+        const querySnapshot = await getDocs(collection(db, "locales"));
+        querySnapshot.forEach((doc) => {
+            locales.push({ id: doc.id, ...doc.data() });
+        });
+        return locales;
+    };
+
+    // Función para actualizar un local
+    const updateLocal = async (id, updatedData) => {
+        try {
+            const localRef = doc(db, "locales", id);
+            await updateDoc(localRef, updatedData);
+            console.log("Local actualizado");
+        } catch (e) {
+            console.error("Error actualizando el local: ", e);
+        }
+    };
+
+    // Función para eliminar un local
+    const deleteLocal = async (auth) => {
+        try {
+            await deleteDoc(doc(db, "locales", id));
+            console.log("Local eliminado");
+        } catch (e) {
+            console.error("Error al eliminar el local: ", e);
+        }
+    };
     //para traer presentaciones
-    const getAllPresentaciones = () => {
-        http.get("/presentaciones/get")
-            .then((response) => {
-                setPresentaciones(response.data.data);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
-    //para traer materias primas
-    const getAllMateriasPrimas = () => {
-        http.get("/materiasprimas/get")
-          .then((response) => {
-            setMateriasPrimas(response.data.data); 
-            console.log(materiasPrimas);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      };
-      //para traer máquinas
-      const getAllMaquinas = () => {
-        http.get("/maquinas/get")
-          .then((response) => {
-            setMaquinas(response.data.data);
-            // console.log(maquinas,'getAllMaquinas');
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      };
-      //para traer trabajadores
-      const getAllResponsables = () => {
-        http.get("/trabajadores/get")
-            .then((response) => {
-                const trabajadoresData = response.data.data.map(trabajador => ({
-                    ...trabajador,
-                    fullName: `${trabajador.nombres} ${trabajador.apellidos}`
-                }));
-                console.log("Trabajadores Data:", trabajadoresData);
-                setTrabajadores(trabajadoresData);
-            })
-            .catch((error) => {
-                console.log(error);
-            });
-    };
-      
-
     //funciones para observaciones
     const cleanTrabajador = () => {
         setProduccion({
@@ -153,25 +150,7 @@ export const PageReprocesamiento = () => {
         setVisibleIniciar(false);
         setVisibleObservacion(false);
     };
-    const handleSetObservacion = () => {
-        http.put(`/producciones/setobservacion/${produccion.id}`, produccion)
-            .then((response) => {
-                showToast(
-                    "success",
-                    "Observación guardada ",
-                    `Se guardo la observación correctamente`
-                );
-                getAllProducciones();
-            })
-            .catch((error) => {
-                console.log(error);
-                showToast(
-                    "error",
-                    "Observación no guardada",
-                    `No se pudo guardar la observacion de ${produccion.codigo_produccion}`
-                );
-            });
-    };
+
 
     //Columna Presentación
     const mostrarPresentacion = (data) => {
@@ -192,40 +171,40 @@ export const PageReprocesamiento = () => {
     const [pdfUrl, setPdfUrl] = useState(false);
     const env = import.meta.env.VITE_APP_API_URL;
     const exportPdf = async (datos, rutaPdf) => {
-      try {
-        console.log(datos)
-        const url = `${env}/${rutaPdf}/${datos.id}`;
-        setPdfUrl(url);
-        
-      } catch (error) {
-        console.log(error);
-        setVisiblePDF(false);
-      }
-      
+        try {
+            console.log(datos)
+            const url = `${env}/${rutaPdf}/${datos.id}`;
+            setPdfUrl(url);
+
+        } catch (error) {
+            console.log(error);
+            setVisiblePDF(false);
+        }
+
     };
-     //columna Trazabilidad
+    //columna Trazabilidad
     const actionTrazabilidad = (rowData) => {
-      return (
-        <React.Fragment>
-          <Button
-            icon="pi pi-file-pdf"
-            className="p-button-outlined p-button-rounded p-button-secondary"
-            onClick={() => exportPdf(rowData, "producciones/imprimirpdf")}
-          />
-        </React.Fragment>
-      );
+        return (
+            <React.Fragment>
+                <Button
+                    icon="pi pi-file-pdf"
+                    className="p-button-outlined p-button-rounded p-button-secondary"
+                    onClick={() => exportPdf(rowData, "producciones/imprimirpdf")}
+                />
+            </React.Fragment>
+        );
     };
     // columna aprobación de calidad pdf
     const actionPDFAprobaciónCalidad = (rowData) => {
-      return (
-        <React.Fragment>
-          <Button
-            icon="pi pi-file-pdf"
-            className="p-button-outlined p-button-rounded p-button-primary"
-            onClick={() => exportPdf(rowData, "produccion/pdf")}
-          />
-        </React.Fragment>
-      );
+        return (
+            <React.Fragment>
+                <Button
+                    icon="pi pi-file-pdf"
+                    className="p-button-outlined p-button-rounded p-button-primary"
+                    onClick={() => exportPdf(rowData, "produccion/pdf")}
+                />
+            </React.Fragment>
+        );
     };
     //Columna Observaciones
     const [observacion, setObservacion] = useState([]);
@@ -330,135 +309,57 @@ export const PageReprocesamiento = () => {
 
     const formatValue = (value) => {
         if (value === null || value === '' || value === undefined) {
-          return '---';
+            return '---';
         }
         return value;
-      };
+    };
 
 
+    const [position, setPosition] = useState(null);
 
+    // Función para capturar la ubicación clickeada en el mapa
+    function LocationMarker() {
+        useMapEvents({
+            click(e) {
+                console.log("des", e)
+                setPosition(e.latlng);
+                // Captura latitud y longitud
+                setLocal({ ...local, "latitud": e.latlng?.lat, "longitud": e?.latlng?.lng })
+            },
+        });
+
+        return position === null ? null : (
+            <Marker position={position}></Marker>
+        );
+    }
+
+
+    const handleChange = (e) => {
+        setLocal({ ...local, [e.target.name]: e.target.value })
+    }
+    console.log("data", local)
     return (
         <>
             <Container url={"getReprocesamiento"}>
                 <Toast ref={toast} />
                 <div className="p-container-header">
                     <div className="p-container-titulo">
-                        <h1 style={{color:'#04638A'}} className="container-titulo-table">Módulo de Reprocesamiento</h1>
+                        <h1 style={{ color: '#04638A' }} className="container-titulo-table">Mis Locales</h1>
                     </div>
                     <div className="container-descripcion">
                         <div className="container-descripcion-table">
                             <p>
-                                A continuación, se visualiza la lista de producciones que se tienen que reprocesar.
+                                A continuación, se visualiza la lista de Locales de la empresa.
                             </p>
                         </div>
                     </div>
                 </div>
+                <>
+                    <CreateLocal visibleCreateLocal={() => { setVisibleAccion(true) }}></CreateLocal>
 
-                <ListProduccion
-                    data={produccionesReproceso}
-                //   onInputSearch={(e) => setGlobalFilter(e.target.value)}
-                //   valueGlobalFilter={globalFilter}
-                //   selection={select}
-                //   onSelectionChange={(e) => {
-                //     setSelect(e.value);
-                //     console.log(e.value);
-                //   }}
-                // //   onClickRefresh={getAllProducciones}
-                >
-                    <Column
-                        field="codigo_produccion"
-                        header="Código"
-                        className="column column-item"
-                        body={(rowData) => formatValue(rowData.codigo_produccion)}
-                    ></Column>
-                    <Column
-                        field={"producto.nombre"}
-                        header="Producto"
-                        className="column column-name"
-                        body={(rowData) => formatValue(rowData.producto.nombre)}
-                    ></Column>
-                    <Column
-                        field={"fecha_produccion"}
-                        header="Fecha de Producción"
-                        className="column column-date"
-                        body={(rowData) => formatValue(rowData.fecha_produccion)}
-                    ></Column>
-                    <Column
-                        // field="cantidad"
-                        header="Fecha de Reprocesamiento"
-                        className="column column-quantity"
-                       
-                    ></Column>
-                    <Column
-                        className="column column-state"
-                        header="Cantidad"
-                        field="cantidad"
-                        // body={actionBodyTemplateIniciarProduccion}
-                        exportable={false}
-                        style={{ maxWidth: "auto" }}
-                        body={(rowData) => formatValue(rowData.cantidad)}
-                    ></Column>
-                    <Column
-                        className="column column-state"
-                        header="Presentación"
-                        body={(e) => mostrarPresentacion(e)}
-                        // body={(e) => estadoProduccion(e)}
-                        exportable={false}
-                        style={{ maxWidth: "auto" }}
-                    ></Column>
-                    <Column
-                        header="Acciones"
-                        body={(e) => botonesAcciones(e)}
-                        exportable={false}
-                        style={{ maxWidth: "auto" }}
-                        className="column column-observations"
-                    ></Column>
-                    <Column
-                        header="Estado"
-                        body={(e) => mostrarEstadoProduccion(e)}
-                        exportable={false}
-                        style={{ maxWidth: "auto" }}
-                        className="column column-cost"
-                    ></Column>
+                </>
 
-                    <Column
-                        header="Observaciones"
-                        body={actionBodyTemplateObservaciones}
-                        exportable={false}
-                        style={{ maxWidth: "auto" }}
-                        className="column column-traceability"
-                    ></Column>
 
-                    <Column
-                        header="Costo de Producción"
-                        field="costo_total"
-                        exportable={false}
-                        style={{ maxWidth: "auto" }}
-                        className="column column-traceability"
-                        body={(rowData) => formatValue(rowData.costo_total)}
-                    ></Column>
-                    <Column
-                        // body={actionBodyTemplateDelete}
-                        header="Costo de Reprocesamiento"
-                        exportable={false}
-                        style={{ maxWidth: "auto" }}
-                        className="column column-delete"
-                    ></Column>
-                    <Column
-                        body={actionTrazabilidad}
-                        header="Trazabilidad"
-                        exportable={false}
-                        style={{ maxWidth: "auto" }}
-                        className="column column-delete"
-                    ></Column>
-                    <Column
-                        body={actionPDFAprobaciónCalidad}
-                        header="Aprobación de Calidad"
-                        exportable={false}
-                        style={{ maxWidth: "auto" }}
-                        className="column column-delete"
-                    ></Column>
-                </ListProduccion>
 
                 {/*DIALOGS DE LAS COLUMNAS */}
                 <Dialog
@@ -493,186 +394,105 @@ export const PageReprocesamiento = () => {
                     </div>
                 </Dialog>
 
-                {/* Dialog para alistar requerimientos */}
                 <Dialog
-                    style={{ width: "65rem", height: "100%" }}
+                    style={{
+                        width: "90rem",
+                        height: "80%",
+                        border: "2px solid #ccc",
+                        borderRadius: "20px"
+                    }}
                     visible={visibleAccion}
                     onHide={() => setVisibleAccion(false)}
-                    header={<><h3 style={{ margin: "0" }}>Seleccionar requirimientos</h3></>}
-                    footer={<div>
-                        <Button
-                            label="Cancelar"
-                            icon="pi pi-times"
-                            className="p-button-danger"
-                            onClick={()=> setVisibleAccion(false)}
-                        />
-                        <Button
-                            label="Aceptar"
-                            icon="pi pi-check"
-                            className="p-button-success"
-                        />
-                    </div>}
+                    header={
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <div style={{ display: "flex", alignItems: "center" }}>
+                                <i className="pi pi-map-marker" style={{
+                                    backgroundColor: "#F2F4FF",
+                                    padding: "0.5rem",
+                                    borderRadius: "10px",
+                                    color: "#116699",
+                                    fontSize: "3rem"
+                                }}></i>
+                                <div style={{ marginLeft: "1rem" }}>
+                                    <h2 style={{ margin: 0, color: "#116699", fontWeight: "750" }}>Crear local</h2>
+                                    <p style={{ margin: 0, color: "#A0A0A0", fontWeight: "600" }}>Busca tu negocio en el mapa y crea tu local.</p>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    footer={
+                        <div>
+                            <Button
+                                label="Cancelar"
+                                icon="pi pi-times"
+                                className="p-button-danger"
+                                onClick={() => setVisibleAccion(false)}
+                            />
+                            <Button
+                                label="Aceptar"
+                                icon="pi pi-check"
+                                className="p-button-success"
+                                onClick={() => {
+                                    console.log('Ubicación seleccionada:', local);
+                                    createLocal(local)
+                                }}
+                            />
+                        </div>
+                    }
                 >
-                    <div className='seccion-reprocesamiento'>
-                        <div className='repro'>
-                            <p>Seleccionar insumos</p>
-                            <div className='caja-select-input'>
-                                <div className='dato'>
-                                    <label>Materia Prima</label>
-                                    <Dropdown
-                                        placeholder="Seleccciona la materia prima"
-                                        options={materiasPrimas}
-                                        optionLabel='nombre_materia'
-                                        filter
-                                        value={materiaSeleccionada}
-                                        onChange={(e)=> setMateriaSeleccionada(e.value)}
-                                    />
-                                </div>
-                                <div className='dato'>
-                                    <label>Cantidad de materia Prima</label>
-                                    <div className='ctd-materia'>
-                                        <InputText />
-                                        <span className='unidad'>KG</span>
-                                    </div>
-                                </div>
-                                <div className='dato'>
-                                    <Button className='btn-agregar' icon='pi pi-plus' label='Agregar Insumo' />
-                                </div>
-                            </div>
 
-                        </div>
-                        <div className='repro'>
-                            <label>Lista de insumos</label>
-                            <TableIngredientes >
-                                <Column
-                                    // field={"materia_prima.nombre_materia"}
-                                    header="Ingrediente"
-                                ></Column>
-                                <Column header="Cantidad"></Column>
-                                <Column
-                                    header="Unidad Medida"
-                                ></Column>
-                                <Column
-                                    header="Eliminar"
-                                    exportable={false}
-                                    style={{ minWidth: "8rem" }}
-                                ></Column>
-                            </TableIngredientes>
-                        </div>
-                        <div className='repro'>
-                            <p>Seleccionar máquinas</p>
-                            <div className='caja-select-input'>
-                                <div className='dato'>
-                                    <label>Máquina</label>
-                                    <Dropdown
-                                        placeholder="Seleccciona la máquina"
-                                        options={maquinas}
-                                        optionLabel='nombre'
-                                        filter
-                                        value={maquinaSeleccionada}
-                                        onChange={(e)=> setMaquinaSeleccionada(e.value)}
-                                    />
-                                </div>
-                                <div className='dato'>
-                                    <label>Cantidad de horas</label>
-                                    <InputText />
-                                </div>
-                                <div className='dato'>
-                                    <label>Batch</label>
-                                    <InputText />
-                                </div>
-                                <div className='dato'>
-                                    <Button className='btn-agregar' icon='pi pi-plus' label='Agregar Máquina' />
-                                </div>
+                    <div style={{ display: 'flex', flexDirection: 'row', height: '100%', overflow: 'hidden' }}>
+                        {/* Inputs */}
+                        <div style={{ flex: 1, marginRight: '20px', overflowY: 'auto' }}>
+                            <div className="field flex flex-column">
+                                <label htmlFor="nombre">Nombre</label>
+                                <InputText name='nombre' onChange={handleChange} value={local?.nombre} />
 
                             </div>
-
+                            <div className="field flex flex-column">
+                                <label htmlFor="horaAtencion">Hora atención</label>
+                                <InputText name='hora_atencion' onChange={handleChange} value={local?.hora_atencion} />
+                            </div>
+                            <div className="field flex flex-column">
+                                <label htmlFor="latitud">Latitud</label>
+                                <InputText value={local?.latitud} onChange={handleChange} name='latitud' />
+                            </div>
+                            <div className="field flex flex-column">
+                                <label htmlFor="longitud">Longitud</label>
+                                <InputText value={local?.longitud} onChange={handleChange} name='longitud' />
+                            </div>
+                            <div className="field flex flex-column">
+                                <label htmlFor="latitud">Departamento</label>
+                                <InputText value={local?.departamento} onChange={handleChange} name='departamento' />
+                            </div>
+                            <div className="field flex flex-column">
+                                <label htmlFor="latitud">Distrito</label>
+                                <InputText value={local?.distrito} onChange={handleChange} name='distrito' />
+                            </div>
+                            <div className="field flex flex-column">
+                                <label htmlFor="direccion">Dirección</label>
+                                <InputText value={local?.direccion} onChange={handleChange} name='direccion' />
+                            </div>
+                            <div className="field flex flex-column">
+                                <label htmlFor="descripcion">Descripción</label>
+                                <InputText value={local?.descripcion} onChange={handleChange} name='descripcion' />
+                            </div>
+                            <div className="field flex flex-column">
+                                <label htmlFor="categoria">Categoría</label>
+                                <Dropdown value={local?.categoria} onChange={handleChange} name='categoria' options={optionsCategorias} optionValue='code' />
+                            </div>
                         </div>
-                        <div className='repro'>
-                            <label>Lista de máquinas</label>
-                            <TableIngredientes >
-                                <Column
-                                    // field={"materia_prima.nombre_materia"}
-                                    header="Máquina"
-                                ></Column>
-                                <Column header="Horas"></Column>
-                                <Column
-                                    header="Batch"
-                                ></Column>
-                                <Column
-                                    header="Servicio"
-                                ></Column>
-                                <Column
-                                    header="Eliminar"
-                                    exportable={false}
-                                    style={{ minWidth: "8rem" }}
-                                ></Column>
-                            </TableIngredientes>
-                        </div>
-                        <div className='repro'>
-                            <div className='dato'>
-                                <label htmlFor='materia_prima'>Costo Total </label>
-                                <InputText
-                                    style={{ width: '25%' }}
-                                    id='cantidad'
-                                    // value={cantidadTotal}
-                                    // onChange={(e) => handleChangeCantidad(e)}
-                                    required
-                                    step="0.01"
-                                    presicion={2}
-                                    keyfilter='num'
-                                    autoComplete='off'
-                                    disabled
-                                    placeholder='Ingrese la cantidad de Producción.'
+                        {/* Mapa con Leaflet */}
+                        <div style={{ height: '100%', flex: 1, backgroundColor: "red" }}>
+                            <MapContainer center={[-12.0464, -77.0428]} zoom={13} style={{ height: '100%', width: '100%' }}>
+                                <TileLayer
+                                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                    attribution="&copy; <a href='https://osm.org/copyright'>OpenStreetMap</a> contributors"
                                 />
-                            </div>
+                                <LocationMarker />
+                            </MapContainer>
                         </div>
-                        <div className='repro'>
-                            <p>Seleccionar Responsables</p>
-                            <div className='caja-select-input'>
-                                <div className='dato'>
-                                    <label>Trabajador</label>
-                                    <Dropdown
-                                        placeholder="Seleccciona trabajador"
-                                        options={trabajadores}
-                                        optionLabel={'fullName'}
-                                        value={trabajadorSeleccionado}
-                                        onChange={(e)=> setTrabajadorSeleccionado(e.value)}
-                                        filter
-                                    />
-                                </div>
-                                <div className='dato'>
-                                    <label>Horas de trabajador</label>
-                                    <InputText />
-                                </div>
-                                <div className='dato'>
-                                    <Button className='btn-agregar' icon='pi pi-plus' label='Agregar Trabajador' />
-                                </div>
-
-                            </div>
-
-                        </div>
-                        <div className='repro'>
-                            <label>Lista de los trabajadores responsables del reprocesamiento</label>
-                            <TableIngredientes >
-                                <Column
-                                    // field={"materia_prima.nombre_materia"}
-                                    header="Apellidos"
-                                ></Column>
-                                <Column header="Nombres"></Column>
-                                <Column
-                                    header="Horas"
-                                ></Column>
-                                <Column
-                                    header="Eliminar"
-                                    exportable={false}
-                                    style={{ minWidth: "8rem" }}
-                                ></Column>
-                            </TableIngredientes>
-                        </div>
-
                     </div>
-
                 </Dialog>
 
             </Container>

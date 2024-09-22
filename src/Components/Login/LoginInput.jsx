@@ -29,7 +29,7 @@ function LoginInput(props) {
         </div>
 
         <div className="galleria-content ">
-
+          
           <p><span className="slider-title-item">{item?.title} </span>{item.description}</p>
           <p className="slider-item-subtitle">{item?.subDescription}</p>
         </div>

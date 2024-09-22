@@ -52,27 +52,27 @@ function Container(props) {
     navigate(`/miPerfil`)
   };
 
-  useEffect(() => {
-    handleMy();
-  }, []);
+  // useEffect(() => {
+  //   handleMy();
+  // }, []);
 
-  const handleMy = async () => {
-    try {
-      const response = await http.post("/my");
-      setMy(response?.data);
-      setPerfil(response?.data);
-      if (!response?.data?.status) {
-        navigate(`/${props?.url}`);
-      } else {
-        // deleteToken();
-        dispatch(logout())
+  // const handleMy = async () => {
+  //   try {
+  //     const response = await http.post("/my");
+  //     setMy(response?.data);
+  //     setPerfil(response?.data);
+  //     if (!response?.data?.status) {
+  //       navigate(`/${props?.url}`);
+  //     } else {
+  //       // deleteToken();
+  //       dispatch(logout())
 
 
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  //     }
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   /*const sleep = (milliseconds) => {
     return new Promise((resolve) => setTimeout(resolve, milliseconds));

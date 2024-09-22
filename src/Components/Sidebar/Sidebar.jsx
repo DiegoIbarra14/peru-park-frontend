@@ -31,7 +31,7 @@ import "./sidebar.css";
 
 const Sidebar = ({ onSidebarToggle }) => {
   let navigate = useNavigate();
-  const accesos = useSelector((state) => state.auth.accesos);
+  // const accesos = useSelector((state) => state.auth.accesos);
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
   const { handleLogout, acceptLogout, rejectLogout, visibleDelete, setVisibleDelete, toast } = useLogout(); // Usa el hook personalizado
@@ -105,20 +105,11 @@ const Sidebar = ({ onSidebarToggle }) => {
   );
 
   const listIcons = {
-    "Lista de producción": <Produccion />,
-    "Lista de Proveedores": <Proveedores />,
-    "Mod. Reprocesamiento": <Reprocesamiento />,
-    "Lista de Máquinas": <Maquinas />,
-    "Lista de Trabajadores": <Trabajadores />,
-    "Lista de Clientes": <Clientes />,
-    "Lista de Servicios": <Servicios />,
-    "Productos Registrados": <Productos />,
-    "Almacén de Prod. Ter": <ProdTer />,
-    "Estadísticas": <Estadisticas />,
-    "Lista de Pedidos": <Pedidos />,
-    "Gestión de roles": <Pedidos />,
-    "Dispositivos permitidos": <Pedidos />,
-    "Almacén de Mat. Primas": <Reprocesamiento />,
+    "Locales": <Produccion />,
+    "Espacios": <Proveedores />,
+    "Alquileres": <Reprocesamiento />,
+    "Ganancias": <Maquinas />,
+  
   };
 
 
@@ -187,45 +178,139 @@ const Sidebar = ({ onSidebarToggle }) => {
               : "sidebar-lista-ul sidebar-lista-ul-compressed"
           }
         >
-          {accesos?.map((item) =>
-            item?.path !== "/dispositivos" ? (
-              <li
-                key={item?.path}
-                style={{
-                  backgroundColor: location.pathname.startsWith(`${item?.path}`)
-                    ? "#04638A"
-                    : "transparent", // Fondo transparente si no está activo
-                  color: location.pathname.startsWith(`${item?.path}`)
-                    ? "#fff"
-                    : "inherit",
-                  display: "flex",
-                  cursor: buttonsDisabled ? "not-allowed" : "pointer",
-                  pointerEvents: buttonsDisabled ? "none" : "auto",
-                }}
-                className={
-                  sidebarExpanded
-                    ? "sidebar-lista-opcion sidebar-lista-opcion-expanded "
-                    : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
-                }
-                onClick={() => handleMenuClick(item?.path)}
-              >
-                {sidebarExpanded
-                  ? listIcons?.[item?.nombre]
-                  : listIcons?.[item?.nombre]}
-                <span
-                  className={
-                    sidebarExpanded
-                      ? "sliderbar-text sliderbar-text-expanded"
-                      : "sliderbar-text sliderbar-text-compressed"
-                  }
-                >
-                  {item?.nombre}
-                </span>
-              </li>
-            ) : (
-              <></>
-            )
-          )}
+          <li
+            style={{
+              backgroundColor: location.pathname.startsWith(`${"/locales"}`)
+                ? "#04638A"
+                : "transparent", // Fondo transparente si no está activo
+              color: location.pathname.startsWith(`/ruta-estatica`)
+                ? "#fff"
+                : "inherit",
+              display: "flex",
+              cursor: buttonsDisabled ? "not-allowed" : "pointer",
+              pointerEvents: buttonsDisabled ? "none" : "auto",
+            }}
+            className={
+              sidebarExpanded
+                ? "sidebar-lista-opcion sidebar-lista-opcion-expanded "
+                : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
+            }
+            onClick={() => handleMenuClick("/locales")} // Ruta estática aquí
+          >
+            {sidebarExpanded
+              ? listIcons?.["Locales"] // Nombre estático aquí
+              : listIcons?.["Locales"]}
+            <span
+              className={
+                sidebarExpanded
+                  ? "sliderbar-text sliderbar-text-expanded"
+                  : "sliderbar-text sliderbar-text-compressed"
+              }
+            >
+              Mis Locales
+            </span>
+          </li>
+          <li
+            style={{
+              backgroundColor: location.pathname.startsWith(`${"/espacios"}`)
+                ? "#04638A"
+                : "transparent", // Fondo transparente si no está activo
+              color: location.pathname.startsWith(`/ruta-estatica`)
+                ? "#fff"
+                : "inherit",
+              display: "flex",
+              cursor: buttonsDisabled ? "not-allowed" : "pointer",
+              pointerEvents: buttonsDisabled ? "none" : "auto",
+            }}
+            className={
+              sidebarExpanded
+                ? "sidebar-lista-opcion sidebar-lista-opcion-expanded "
+                : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
+            }
+            onClick={() => handleMenuClick("/espacios")} // Ruta estática aquí
+          >
+            {sidebarExpanded
+              ? listIcons?.["Locales"] // Nombre estático aquí
+              : listIcons?.["Locales"]}
+            <span
+              className={
+                sidebarExpanded
+                  ? "sliderbar-text sliderbar-text-expanded"
+                  : "sliderbar-text sliderbar-text-compressed"
+              }
+            >
+              Mis Espacios
+              
+            </span>
+          </li>
+          <li
+            style={{
+              backgroundColor: location.pathname.startsWith(`${"/alquileres"}`)
+                ? "#04638A"
+                : "transparent", // Fondo transparente si no está activo
+              color: location.pathname.startsWith(`/ruta-estatica`)
+                ? "#fff"
+                : "inherit",
+              display: "flex",
+              cursor: buttonsDisabled ? "not-allowed" : "pointer",
+              pointerEvents: buttonsDisabled ? "none" : "auto",
+            }}
+            className={
+              sidebarExpanded
+                ? "sidebar-lista-opcion sidebar-lista-opcion-expanded "
+                : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
+            }
+            onClick={() => handleMenuClick("/alquileres")} // Ruta estática aquí
+          >
+            {sidebarExpanded
+              ? listIcons?.["Locales"] // Nombre estático aquí
+              : listIcons?.["Locales"]}
+            <span
+              className={
+                sidebarExpanded
+                  ? "sliderbar-text sliderbar-text-expanded"
+                  : "sliderbar-text sliderbar-text-compressed"
+              }
+            >
+              Mis Alquileres
+            </span>
+
+          </li>
+          <li
+            style={{
+              backgroundColor: location.pathname.startsWith(`${"/ganancias"}`)
+                ? "#04638A"
+                : "transparent", // Fondo transparente si no está activo
+              color: location.pathname.startsWith(`/ruta-estatica`)
+                ? "#fff"
+                : "inherit",
+              display: "flex",
+              cursor: buttonsDisabled ? "not-allowed" : "pointer",
+              pointerEvents: buttonsDisabled ? "none" : "auto",
+            }}
+            className={
+              sidebarExpanded
+                ? "sidebar-lista-opcion sidebar-lista-opcion-expanded "
+                : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
+            }
+            onClick={() => handleMenuClick("/ganancias")} // Ruta estática aquí
+          >
+            {sidebarExpanded
+              ? listIcons?.["Locales"] // Nombre estático aquí
+              : listIcons?.["Locales"]}
+            <span
+              className={
+                sidebarExpanded
+                  ? "sliderbar-text sliderbar-text-expanded"
+                  : "sliderbar-text sliderbar-text-compressed"
+              }
+            >
+              Mis Ganancias
+            </span>
+          </li>
+
+
+
 
           <div
             className={

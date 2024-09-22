@@ -8,6 +8,7 @@ import { signInUser } from "../../reducers/authSlices";
 import { showToast } from "../../helpers/showToast";
 import { history } from "../../history";
 import { useNotificaciones } from "../../NotificacionesContext";
+import { loginService } from "../../Services/AuthService";
 
 export default function PageLogin(props) {
 
@@ -34,14 +35,14 @@ export default function PageLogin(props) {
     });
   };
   const handleSubmit = async (e) => {
-    setLoading(true);
+    
+    setLoading(usuario);
     try {
-      let response = await dispatch(signInUser(usuario)).unwrap()
+      let response=await loginService.login(usuario)
       setDataUsuario(response?.data);
-      LoginService.setToken(response?.data?.token);
+      LoginService.setToken(response?.accessToken);
       setLoading(false);
-      const { from } = history?.location?.state || { from: { pathname: response?.data?.rol?.accesos?.[0]?.path } };
-      history.navigate(from);
+      history.navigate("/locales");
       showToast("success", "Usuario correcto", `Bienvenido`, toast);
     } catch (error) {
       console.log(error);
@@ -52,9 +53,10 @@ export default function PageLogin(props) {
         toast
       );
       setLoading(false);
-    }
-
+    console.log("response",response)
     
+
+    }   
     
     //   .then((response) => {
 
