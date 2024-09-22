@@ -36,13 +36,13 @@ body{
 }
 
 
-.p-sidebar{
+.p-sidebar {
   grid-area: p-sidebar;
   z-index: 25;
   width: 310px;
   height: 100vh;
   min-height: 950px;
-  background-color:#05749E;
+  background: linear-gradient(to bottom, #0e0116, #0026ff); /* Degradado de azul a negro */
 }
 
 .p-navbar{

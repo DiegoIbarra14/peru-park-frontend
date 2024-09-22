@@ -36,16 +36,24 @@
     width: auto; 
   }
 }
-.contenedor-principal{
+.contenedor-principal {
   display: grid;
   grid-template-columns: 1fr 1fr;
   justify-content: center;
   box-sizing: border-box;
-  background: url("../../Imagenes/tablero_horizontal_fondo_login.svg");
+  
+  /* Degradado suave de celeste a oscuro */
+  background: linear-gradient(to right, #00a2ff, #000000);
+  
+  /* Asegura que el fondo cubra todo el contenedor */
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  
+  /* Opcional: Define una altura para visualizar mejor el fondo */
+  height: 100vh;
 }
+
 .contenedor-slider{
   grid-column: 1/2;
   display: flex;

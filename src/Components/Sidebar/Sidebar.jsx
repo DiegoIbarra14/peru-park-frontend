@@ -4,7 +4,7 @@ import { useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 // Importación elementos visuales
-import logo from "../../Imagenes/sipro-logo.svg";
+import logo from "../../Imagenes/LOGO-Photoroom.pngz";
 import logoresponsive from "../../Imagenes/LogRes.png";
 import { useLogout } from "../../hooks/useLogout"; // Importa el hook personalizado
 import { Toast } from "primereact/toast";
