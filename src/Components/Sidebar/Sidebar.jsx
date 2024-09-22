@@ -1,3 +1,4 @@
+// src/components/sidebar/Sidebar.js
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
@@ -13,28 +14,22 @@ import { Button } from "primereact/button";
 
 // Íconos de cada módulo
 import {
-  Pedidos,
-  Clientes,
-  Estadisticas,
-  Maquinas,
-  ProdTer,
-  Produccion,
-  Productos,
-  Proveedores,
-  Reprocesamiento,
-  Servicios,
-  Trabajadores,
-} from "./index-iconos";
+  Produccion,         // INICIO
+  Proveedores,        // LOCALES
+  Reprocesamiento,    // NOTIFICACIONES
+  Maquinas,           // MIS ALQUILERES
+} from "./index-iconos"; // Asegúrate de que estos iconos están correctamente definidos
 
 import "primeicons/primeicons.css";
 import "./sidebar.css";
 
 const Sidebar = ({ onSidebarToggle }) => {
-  let navigate = useNavigate();
-  const accesos = useSelector((state) => state.auth.accesos);
+  const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarExpanded, setSidebarExpanded] = useState(true);
   const [buttonsDisabled, setButtonsDisabled] = useState(false);
-  const { handleLogout, acceptLogout, rejectLogout, visibleDelete, setVisibleDelete, toast } = useLogout(); // Usa el hook personalizado
+  const { acceptLogout, rejectLogout, visibleDelete, setVisibleDelete } = useLogout(); // Usa el hook personalizado
+
   const handleMenuClick = (path) => {
     // Evitar la navegación si los botones están deshabilitados
     if (!buttonsDisabled && location.pathname !== path) {
@@ -72,8 +67,6 @@ const Sidebar = ({ onSidebarToggle }) => {
     };
   }, []);
 
-  const location = useLocation();
-
   const Fond = () => (
     <svg
       width="312"
@@ -104,26 +97,17 @@ const Sidebar = ({ onSidebarToggle }) => {
     </svg>
   );
 
+  // Definir los íconos correspondientes
   const listIcons = {
-    "INICIO": <Produccion />,
-    "LOCALES": <Proveedores />,
-    "NOTIFICACIONES": <Reprocesamiento />,
-    "MIS ALQUILERES": <Maquinas />,
-    "Lista de Trabajadores": <Trabajadores />,
-    "Lista de Clientes": <Clientes />,
-    "Lista de Servicios": <Servicios />,
-    "Productos Registrados": <Productos />,
-    "Almacén de Prod. Ter": <ProdTer />,
-    "Estadísticas": <Estadisticas />,
-    "Lista de Pedidos": <Pedidos />,
-    "Gestión de roles": <Pedidos />,
-    "Dispositivos permitidos": <Pedidos />,
-    "Almacén de Mat. Primas": <Reprocesamiento />,
+    "INICIO": <Produccion />,            // Asegúrate de que <Produccion /> es tu icono para INICIO
+    "LOCALES": <Proveedores />,          // Asegúrate de que <Proveedores /> es tu icono para LOCALES
+    "NOTIFICACIONES": <Reprocesamiento />, // Asegúrate de que <Reprocesamiento /> es tu icono para NOTIFICACIONES
+    "MIS ALQUILERES": <Maquinas />,       // Asegúrate de que <Maquinas /> es tu icono para MIS ALQUILERES
   };
-
 
   return (
     <>
+      {/* Botón para expandir/comprimir la Sidebar */}
       <div className="toggle-button" onClick={handleIconClick}>
         <i
           className={sidebarExpanded ? "pi pi-arrow-left" : "pi pi-arrow-right"}
@@ -134,6 +118,8 @@ const Sidebar = ({ onSidebarToggle }) => {
           }}
         ></i>
       </div>
+
+      {/* Logo de la Sidebar */}
       <div
         className={
           sidebarExpanded
@@ -148,7 +134,7 @@ const Sidebar = ({ onSidebarToggle }) => {
           alignItems: "center",
         }}
       >
-        {sidebarExpanded ? <Fond /> : ""}
+        {sidebarExpanded && <Fond />}
         <img
           className={
             sidebarExpanded
@@ -158,7 +144,7 @@ const Sidebar = ({ onSidebarToggle }) => {
           style={{ zIndex: 900, position: "absolute", width: "180px" }}
           src={logo}
           alt="logo"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/inicio")}
         />
         <img
           className={
@@ -169,16 +155,18 @@ const Sidebar = ({ onSidebarToggle }) => {
           style={{ zIndex: 200, position: "absolute", width: "50px" }}
           src={logoresponsive}
           alt="logo"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/inicio")}
         />
       </div>
+
+      {/* Lista de Menú */}
       <div
         className={
           sidebarExpanded
             ? "sidebar-lista sidebar-lista-expanded"
             : "sidebar-lista sidebar-lista-compressed"
         }
-        style={{ position: "absolute", top: 0, paddingTop: 220, bottom: 0, }}
+        style={{ position: "absolute", top: 0, paddingTop: 220, bottom: 0 }}
       >
         <ul
           className={
@@ -187,52 +175,186 @@ const Sidebar = ({ onSidebarToggle }) => {
               : "sidebar-lista-ul sidebar-lista-ul-compressed"
           }
         >
-          {accesos?.map((item) =>
-            item?.path !== "/dispositivos" ? (
-              <li
-                key={item?.path}
-                style={{
-                  backgroundColor: location.pathname.startsWith(`${item?.path}`)
-                    ? "#04638A"
-                    : "transparent", // Fondo transparente si no está activo
-                  color: location.pathname.startsWith(`${item?.path}`)
-                    ? "#fff"
-                    : "inherit",
-                  display: "flex",
-                  cursor: buttonsDisabled ? "not-allowed" : "pointer",
-                  pointerEvents: buttonsDisabled ? "none" : "auto",
-                }}
+          {/* Elemento 1: INICIO */}
+          <li
+            style={{
+              backgroundColor: location.pathname.startsWith("/inicio")
+                ? "#04638A"
+                : "transparent",
+              color: location.pathname.startsWith("/inicio")
+                ? "#fff"
+                : "inherit",
+              display: "flex",
+              alignItems: "center",
+              cursor: buttonsDisabled ? "not-allowed" : "pointer",
+              pointerEvents: buttonsDisabled ? "none" : "auto",
+              padding: "10px 20px",
+              borderRadius: "4px",
+              marginBottom: "10px",
+              transition: "background-color 0.3s, color 0.3s",
+            }}
+            className={
+              sidebarExpanded
+                ? "sidebar-lista-opcion sidebar-lista-opcion-expanded"
+                : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
+            }
+            onClick={() => handleMenuClick("/inicio")}
+          >
+            {/* Icono */}
+            <div style={{ marginRight: sidebarExpanded ? "10px" : "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {listIcons["INICIO"]}
+            </div>
+            {/* Texto */}
+            {sidebarExpanded && (
+              <span
                 className={
                   sidebarExpanded
-                    ? "sidebar-lista-opcion sidebar-lista-opcion-expanded "
-                    : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
+                    ? "sliderbar-text sliderbar-text-expanded"
+                    : "sliderbar-text sliderbar-text-compressed"
                 }
-                onClick={() => handleMenuClick(item?.path)}
               >
-                {sidebarExpanded
-                  ? listIcons?.[item?.nombre]
-                  : listIcons?.[item?.nombre]}
-                <span
-                  className={
-                    sidebarExpanded
-                      ? "sliderbar-text sliderbar-text-expanded"
-                      : "sliderbar-text sliderbar-text-compressed"
-                  }
-                >
-                  {item?.nombre}
-                </span>
-              </li>
-            ) : (
-              <></>
-            )
-          )}
+                INICIO
+              </span>
+            )}
+          </li>
 
+          {/* Elemento 2: LOCALES */}
+          <li
+            style={{
+              backgroundColor: location.pathname.startsWith("/locales")
+                ? "#04638A"
+                : "transparent",
+              color: location.pathname.startsWith("/locales")
+                ? "#fff"
+                : "inherit",
+              display: "flex",
+              alignItems: "center",
+              cursor: buttonsDisabled ? "not-allowed" : "pointer",
+              pointerEvents: buttonsDisabled ? "none" : "auto",
+              padding: "10px 20px",
+              borderRadius: "4px",
+              marginBottom: "10px",
+              transition: "background-color 0.3s, color 0.3s",
+            }}
+            className={
+              sidebarExpanded
+                ? "sidebar-lista-opcion sidebar-lista-opcion-expanded"
+                : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
+            }
+            onClick={() => handleMenuClick("/locales")}
+          >
+            {/* Icono */}
+            <div style={{ marginRight: sidebarExpanded ? "10px" : "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {listIcons["LOCALES"]}
+            </div>
+            {/* Texto */}
+            {sidebarExpanded && (
+              <span
+                className={
+                  sidebarExpanded
+                    ? "sliderbar-text sliderbar-text-expanded"
+                    : "sliderbar-text sliderbar-text-compressed"
+                }
+              >
+                LOCALES
+              </span>
+            )}
+          </li>
+
+          {/* Elemento 3: NOTIFICACIONES */}
+          <li
+            style={{
+              backgroundColor: location.pathname.startsWith("/notificaciones")
+                ? "#04638A"
+                : "transparent",
+              color: location.pathname.startsWith("/notificaciones")
+                ? "#fff"
+                : "inherit",
+              display: "flex",
+              alignItems: "center",
+              cursor: buttonsDisabled ? "not-allowed" : "pointer",
+              pointerEvents: buttonsDisabled ? "none" : "auto",
+              padding: "10px 20px",
+              borderRadius: "4px",
+              marginBottom: "10px",
+              transition: "background-color 0.3s, color 0.3s",
+            }}
+            className={
+              sidebarExpanded
+                ? "sidebar-lista-opcion sidebar-lista-opcion-expanded"
+                : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
+            }
+            onClick={() => handleMenuClick("/notificaciones")}
+          >
+            {/* Icono */}
+            <div style={{ marginRight: sidebarExpanded ? "10px" : "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {listIcons["NOTIFICACIONES"]}
+            </div>
+            {/* Texto */}
+            {sidebarExpanded && (
+              <span
+                className={
+                  sidebarExpanded
+                    ? "sliderbar-text sliderbar-text-expanded"
+                    : "sliderbar-text sliderbar-text-compressed"
+                }
+              >
+                NOTIFICACIONES
+              </span>
+            )}
+          </li>
+
+          {/* Elemento 4: MIS ALQUILERES */}
+          <li
+            style={{
+              backgroundColor: location.pathname.startsWith("/mis-alquileres")
+                ? "#04638A"
+                : "transparent",
+              color: location.pathname.startsWith("/mis-alquileres")
+                ? "#fff"
+                : "inherit",
+              display: "flex",
+              alignItems: "center",
+              cursor: buttonsDisabled ? "not-allowed" : "pointer",
+              pointerEvents: buttonsDisabled ? "none" : "auto",
+              padding: "10px 20px",
+              borderRadius: "4px",
+              marginBottom: "10px",
+              transition: "background-color 0.3s, color 0.3s",
+            }}
+            className={
+              sidebarExpanded
+                ? "sidebar-lista-opcion sidebar-lista-opcion-expanded"
+                : "sidebar-lista-opcion2 sidebar-lista-opcion-compressed"
+            }
+            onClick={() => handleMenuClick("/mis-alquileres")}
+          >
+            {/* Icono */}
+            <div style={{ marginRight: sidebarExpanded ? "10px" : "0", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              {listIcons["MIS ALQUILERES"]}
+            </div>
+            {/* Texto */}
+            {sidebarExpanded && (
+              <span
+                className={
+                  sidebarExpanded
+                    ? "sliderbar-text sliderbar-text-expanded"
+                    : "sliderbar-text sliderbar-text-compressed"
+                }
+              >
+                MIS ALQUILERES
+              </span>
+            )}
+          </li>
+
+          {/* Botón de Cerrar Sesión */}
           <div
             className={
               sidebarExpanded
                 ? "cerrar-sesion-expanded"
                 : "cerrar-sesion-compressed"
             }
+            style={{ marginTop: "auto", padding: "20px" }}
           >
             <Button
               icon="pi pi-sign-out"
@@ -243,7 +365,6 @@ const Sidebar = ({ onSidebarToggle }) => {
                 alignItems: "center",
                 cursor: "pointer",
                 pointerEvents: buttonsDisabled ? "none" : "auto",
-                marginTop: 50,
                 border: "none",
               }}
               className={
@@ -253,12 +374,13 @@ const Sidebar = ({ onSidebarToggle }) => {
               }
               onClick={() => setVisibleDelete(true)}
             >
-              {sidebarExpanded && <span className="pl-3 ">Cerrar sesión</span>}
+              {sidebarExpanded && <span className="pl-3">Cerrar sesión</span>}
             </Button>
           </div>
         </ul>
-
       </div>
+
+      {/* Dialogo de Confirmación para Cerrar Sesión */}
       <ConfirmDialog
         visible={visibleDelete}
         onHide={() => setVisibleDelete(false)}
@@ -271,4 +393,5 @@ const Sidebar = ({ onSidebarToggle }) => {
     </>
   );
 };
+
 export default Sidebar;

@@ -84,7 +84,7 @@ function LoginInput(props) {
                 <div className="login-field flex flex-column  gap-1">
                   <label htmlFor="username">Correo Electronico</label>
                   <InputText value={props.valueUsuario}
-                    onChange={props.onChangeValueUsuario} id="username" placeholder="Nombre de usuario" onKeyDown={handleKeyPress}/>
+                    onChange={props.onChangeValueUsuario} id="username" placeholder="Correo electronico" onKeyDown={handleKeyPress}/>
                 </div>
                 <div className="login-field flex flex-column gap-1 ">
                   <label htmlFor="password">Contraseña</label>
